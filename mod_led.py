@@ -1,4 +1,5 @@
 ﻿import RPi.GPIO as GPIO
+import threading
 from time import sleep
 
 class Led:
@@ -14,8 +15,6 @@ class Led:
         """Run only as a thread function"""
         state = 1 - self.pins[color][1]
         GPIO.output(self.pins[color][0], state)
-        if time != 0:
-            sleep time;
-            state = 1-state
-            GPIO.output(self.pins[color][0], state)
         self.pins[color][1] = state
+        if time != 0:
+            threading.Timer(time, self.switch(color)).start()

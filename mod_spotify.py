@@ -20,14 +20,17 @@ class Spotify:
 
         self.logged_in = threading.Event()
         self.end_of_track = threading.Event()
-        self.play = threading.Event()
         self.session.on(spotify.SessionEvent.CONNECTION_STATE_UPDATED, self._update)
         self.session.on(spotify.SessionEvent.END_OF_TRACK, self._on_end_of_track)
 
         self.session.login(credencials.user(), credencials.password())
         self.logged_in.wait()
 
-        self._setup()
+        self.session.playlist_container.load()
+
+        self.playing = False
+        self.current_playlist = 0
+        self.current_track = 0
 
     def _update(self, session):
         if session.connection.state is spotify.ConnectionState.LOGGED_IN:
@@ -36,17 +39,22 @@ class Spotify:
     def _on_end_of_track(self):
         self.end_of_track.set()
 
-    def _setup(self):
-        current_playlist = 0
-        current_track = 0
-        playing = False
+    def play(self):
+        if self.playing:
+            self.playing = False
+            if self.session.player.state is spotify.PlayerState.PLAYING:
+                self.session.player.pause()
+        else:
+            self.playing = True
+            if self.session.player.state is spotify.PlayerState.UNLOADED:
+                track = self.session.playlist_container[self.current_playlist].tracks[self.current_track]
+                self._play_track(track)
+            else if self.session.player.state is spotify.PlayerState.LOADED or
+                    self.session.player.state is spotify.PlayerState.PAUSED:
+                self.session.player.play()
 
-
-
-    def switch_play(self):
-        if
-    def _play(self, name):
-        track = self.session.get_track(name)
-        track.load()
+    def _play_track(self, name):
+        if not self.session.player.state is spotify.PlayerState.UNLOADED:
+            self.session.player.unload()
         self.session.player.load(track)
         self.session.player.play()
