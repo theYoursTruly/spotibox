@@ -7,9 +7,10 @@ class Led:
     def __init__(self):
         """Initialize GPIO pins and start threads for each diode"""
         GPIO.setmode(GPIO.BOARD)
-        self.pins = {"blue":(11,0), "green":(19,0)}
-        GPIO.output(self.pin_blue, state)
-        GPIO.setup((self.pin_green, self.pin_blue), GPIO.OUT)
+        self.pins = {"blue":[19,0], "green":[11,0]}
+        GPIO.setup((self.pins["blue"][0], self.pins["green"][0]), GPIO.OUT)
+        GPIO.output(self.pins["blue"][0], 0)
+        GPIO.output(self.pins["green"][0], 0)
 
     def switch(self, color, time=0):
         """Run only as a thread function"""
