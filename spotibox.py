@@ -21,8 +21,8 @@ def _handle_click(button, module):
         _spotify.switch_playlist()
     elif button == "shuffle":
         _spotify.toggle_shuffle()
-    elif button == "reset":
-        _spotify.setup()
+    elif button == "delay":
+        _spotify.delayed_pause(2000)
     else:
         print ("How come there is more buttons?")
         pass

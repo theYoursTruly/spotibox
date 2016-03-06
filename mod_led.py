@@ -18,4 +18,4 @@ class Led:
         GPIO.output(self.pins[color][0], state)
         self.pins[color][1] = state
         if time != 0:
-            threading.Timer(time, self.switch(color)).start()
+            threading.Timer(time, self.switch, [color]).start()

@@ -5,7 +5,7 @@ class Buttons:
     """Low-level class handling button-clicks on the Spotibox."""
     def __init__(self):
         """Setup GPIO pins for buttons and prepare variables needed later."""
-        self.buttons = {"play":12, "prev":16, "next":18, "playlist":22, "shuffle":13, "reset":15,}
+        self.buttons = {"play":12, "prev":16, "next":18, "playlist":22, "shuffle":13, "delay":15,}
         GPIO.setmode(GPIO.BOARD)
         GPIO.setup((12,13,15,16,18,22), GPIO.IN)
 

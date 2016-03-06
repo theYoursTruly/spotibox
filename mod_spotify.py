@@ -45,14 +45,14 @@ class Spotify:
         self.shuffle = False
         print ("Settings reset")
 
-    def play(self):
+    def play(self, stop_only=False):
         """Start/pause/resume the current track."""
         if self.playing:
             self.playing = False
             if self.session.player.state is spotify.PlayerState.PLAYING:
                 self.session.player.pause()
             print ("Track paused")
-        else:
+        elif not stop_only:
             self.playing = True
             if self.session.player.state is spotify.PlayerState.UNLOADED:
                 self._play_track(self.current_tracks[self.current_track_num])
@@ -86,6 +86,12 @@ class Spotify:
         self.shuffle = not self.shuffle
         print ("Shuffle %d" % (self.shuffle,))
 
+    def delayed_pause(self, delay):
+        """Stops the playback after delay (in seconds)."""
+        if delay > 0:
+            print ("Initiate delayed pause by %dsec" % (delay,))
+            threading.Timer(delay, self.play, [True]).start()
+
     # -------- Private Methods ---------
 
     def _update(self, session):
@@ -93,8 +99,9 @@ class Spotify:
         if session.connection.state is spotify.ConnectionState.LOGGED_IN:
             self.logged_in.set()
 
-    def _on_end_of_track(self):
+    def _on_end_of_track(self, session):
         """Detect end of track and switch to the next one."""
+        print ("End of track, load the next one.")
         self.switch_track(1)
 
     def _generate_shuffle(self, count):
@@ -111,6 +118,7 @@ class Spotify:
             self.session.player.unload()
         try:
             print ("Play the track: %s" % (track.name,))
+            self.session.player.prefetch(track)
             self.session.player.load(track)
             self.session.player.play()
         except:
