@@ -4,14 +4,13 @@ import mod_led
 from time import sleep
 import signal
 
-_spotify = mod_spotify.Spotify()
 _led = mod_led.Led()
+_spotify = mod_spotify.Spotify(_led)
 _buttons = mod_buttons.Buttons()
 
 def _handle_click(button, module):
     _led.switch("green")
     if button == "play":
-        _led.switch("blue")
         _spotify.play()
     elif button == "prev":
         _spotify.switch_track(-1)
@@ -22,7 +21,7 @@ def _handle_click(button, module):
     elif button == "shuffle":
         _spotify.toggle_shuffle()
     elif button == "delay":
-        _spotify.delayed_pause(2000)
+        _spotify.snooze(2000)
     else:
         print ("How come there is more buttons?")
         pass
