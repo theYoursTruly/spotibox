@@ -7,7 +7,7 @@ import credencials # file not included in GIT repository
 class Spotify:
     """Spotify handler responsible for communication between Spotibox and Spotify service."""
     def __init__(self, led_module):
-        #logging.basicConfig(level=logging.DEBUG)
+        logging.basicConfig(level=logging.INFO)
 
         config = spotify.Config()
         config.load_application_key_file()
@@ -80,7 +80,7 @@ class Spotify:
         self.current_tracks = self.current_playlist.tracks
         self._generate_tracklist()
         self.current_track_num = 0
-        print ("Playlist ready to play [%s]" % (self.current_playlist.name,))
+        print ("Playlist ready to play [%s]" % (self.current_playlist.name.encode('utf-8'),))
         if self.playing:
             self.session.player.unload()
             self.play()
@@ -122,11 +122,11 @@ class Spotify:
 
     def _play_track(self, track):
         """Low-level method to play a track."""
-        if self.session.player.state is spotify.PlayerState.UNLOADED:
-            track.load()
-            self.session.player.load(track)
         try:
-            print ("Play the track: %s" % (track.name,))
+            if self.session.player.state is spotify.PlayerState.UNLOADED:
+                track.load()
+                self.session.player.load(track)
+            print ("Play the track: %s" % (track.name.encode('utf-8'),))
             self.session.player.play()
         except:
             print ("[%d] Unable to play the track: %s" % (self.last_offset, track.name))
