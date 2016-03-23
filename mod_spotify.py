@@ -37,6 +37,7 @@ class Spotify:
         self.current_tracks = self.current_playlist.tracks
         self.current_playlist_num = 0
         self.current_track_num = 0
+        self.autounload = None
         self.last_offset = 1
         self.playing = False
         self.shuffle = False
@@ -44,6 +45,9 @@ class Spotify:
 
     def play(self, stop=False):
         """Start/pause/resume the current track."""
+        if self.autounload is not None:
+            self.autounload.cancel()
+            self.autounload = None
         player_state = self.session.player.state
         if stop:
             self.session.player.unload()
@@ -54,6 +58,8 @@ class Spotify:
             self.session.player.pause()
             self.playing = False
             self.led.switch("blue", 0)
+            self.autounload = threading.Timer(3600, self.play, [True])
+            self.autounload.start()
             print ("Pause track")
         else:
             self._play_track(self._get_track(0))
@@ -118,7 +124,7 @@ class Spotify:
 
     def _get_track(self, offset):
         """Return track that is 'offset' apart from the current one."""
-        return self.current_tracks[self.tracks_order[self.current_track_num + offset]]
+        return self.current_tracks[self.tracks_order[(self.current_track_num + offset) % len(self.current_tracks)]]
 
     def _play_track(self, track):
         """Low-level method to play a track."""
